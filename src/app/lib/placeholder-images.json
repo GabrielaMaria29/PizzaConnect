@@ -1,0 +1,10 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-pizza",
+      "description": "Uma pizza artesanal deliciosa saindo do forno",
+      "imageUrl": "https://picsum.photos/seed/pizzahero/1200/800",
+      "imageHint": "artisan pizza"
+    }
+  ]
+}
