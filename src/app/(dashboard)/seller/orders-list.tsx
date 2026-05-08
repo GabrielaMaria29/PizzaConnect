@@ -136,6 +136,7 @@ export default function SellerOrdersList() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="font-headline">Data/Hora</TableHead>
+                  <TableHead className="font-headline">Canhoto</TableHead>
                   <TableHead className="font-headline">Cliente</TableHead>
                   <TableHead className="font-headline">Sabores</TableHead>
                   <TableHead className="font-headline">Pagamento</TableHead>
@@ -156,7 +157,9 @@ export default function SellerOrdersList() {
                     <TableCell className="text-xs whitespace-nowrap">
                       {formatDate(order.createdAt)}
                     </TableCell>
-
+                    <TableCell className="font-semibold whitespace-nowrap">
+                      {order.numeroCanhoto || "-"}
+                    </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="font-semibold">{order.nome}</span>
