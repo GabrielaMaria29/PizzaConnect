@@ -32,6 +32,7 @@ const PAGAMENTOS = ["Pix", "Cartão", "Dinheiro", "Ainda vai pagar"];
 const ENTREGUE = ["NÃO", "SIM", "DOAÇÃO"] as const;
 
 const orderSchema = z.object({
+  numeroCanhoto: z.string().min(1, "Informe o número do canhoto"),
   nome: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
   telefone: z.string().min(10, "Telefone inválido"),
   sabores: z
@@ -76,6 +77,7 @@ export function OrderForm({
   const form = useForm<OrderFormValues>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
+      numeroCanhoto: initialData?.numeroCanhoto || "",
       nome: initialData?.nome || "",
       telefone: initialData?.telefone || "",
       sabores: initialSabores,
@@ -142,6 +144,24 @@ export function OrderForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+            control={form.control}
+            name="numeroCanhoto"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Número do Canhoto</FormLabel>
+
+                <FormControl>
+                  <Input
+                    placeholder="Ex: 152"
+                    {...field}
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="nome"
@@ -392,6 +412,7 @@ export function OrderForm({
             variant="outline"
             onClick={() =>
               form.reset({
+                numeroCanhoto: "",
                 nome: "",
                 telefone: "",
                 sabores: [],

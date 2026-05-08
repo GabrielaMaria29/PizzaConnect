@@ -23,6 +23,7 @@ export type SaborQuantidade = {
 
 export type Order = {
   id?: string;
+  numeroCanhoto: string;
   nome: string;
   telefone: string;
   vendedorId: string;

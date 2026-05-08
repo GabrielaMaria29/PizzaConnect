@@ -55,6 +55,7 @@ export default function AdminOrdersPage() {
 
   const filteredOrders = orders.filter((o) => {
     const matchesSearch =
+      o.numeroCanhoto?.includes(searchTerm) ||
       o.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       o.telefone.includes(searchTerm) ||
       o.vendedorNome.toLowerCase().includes(searchTerm.toLowerCase());
@@ -113,6 +114,7 @@ export default function AdminOrdersPage() {
 
     const headers = [
       "Data",
+      "Canhoto",
       "Cliente",
       "Telefone",
       "Vendedor",
@@ -125,6 +127,7 @@ export default function AdminOrdersPage() {
 
     const rows = filteredOrders.map((order) => [
       formatDate(order.createdAt),
+      order.numeroCanhoto ?? "",
       order.nome ?? "",
       order.telefone ?? "",
       order.vendedorNome ?? "",
@@ -254,6 +257,7 @@ export default function AdminOrdersPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Data</TableHead>
+                    <TableHead>Canhoto</TableHead>
                     <TableHead>Cliente</TableHead>
                     <TableHead>Vendedor</TableHead>
                     <TableHead>Sabores</TableHead>
@@ -270,7 +274,7 @@ export default function AdminOrdersPage() {
                       <TableCell className="text-xs">
                         {formatDate(order.createdAt)}
                       </TableCell>
-
+                      <TableCell>{order.numeroCanhoto}</TableCell>
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="font-semibold">{order.nome}</span>
