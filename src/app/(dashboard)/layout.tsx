@@ -133,6 +133,12 @@ export default function DashboardLayout({
                 >
                   Vendedores
                 </Link>
+                <Link
+                  href="/admin/new-order"
+                  className="text-sm font-medium hover:text-primary transition-colors"
+                >
+                  Adicionar Pedido
+                </Link>
               </>
             ) : (
               <>
@@ -206,6 +212,12 @@ export default function DashboardLayout({
                   className="text-lg font-medium"
                 >
                   Vendedores
+                </Link>
+                <Link
+                  href="/admin/new-order"
+                  className="text-sm font-medium hover:text-primary transition-colors"
+                >
+                  Adicionar Pedido
                 </Link>
               </>
             ) : (

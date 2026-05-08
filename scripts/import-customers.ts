@@ -15,7 +15,7 @@ const FILE_PATH = "./clientes.xlsx";
 const SHEET_NAME = "Respostas";
 
 // ajuste aqui exatamente conforme os nomes das colunas da planilha
-const COL_NOME = "Nome do Comprador ";
+const COL_NOME = "Nome do Comprador";
 const COL_TELEFONE = "Telefone do Comprador (Whatsapp)";
 
 function normalizarTelefone(valor: unknown): string {
