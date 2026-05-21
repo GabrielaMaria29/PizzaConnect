@@ -77,6 +77,16 @@ export default function AdminOrdersPage() {
       matchesEntregue
     );
   });
+  const totalPedidosFiltrados = filteredOrders.length;
+
+    const totalPizzasFiltradas = filteredOrders.reduce((acc, order) => {
+      return (
+        acc +
+        (order.sabores?.reduce((sum, sabor) => {
+          return sum + Number(sabor.quantidade || 0);
+        }, 0) || 0)
+      );
+    }, 0);
 
   const handleEdit = async (values: any) => {
     if (!selectedOrder?.id) return;
@@ -247,6 +257,21 @@ export default function AdminOrdersPage() {
         </CardHeader>
 
         <CardContent>
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        <div className="rounded-lg border bg-muted/30 px-4 py-3">
+          <p className="text-xs text-muted-foreground">Pedidos filtrados</p>
+          <p className="text-2xl font-bold text-primary">
+            {totalPedidosFiltrados}
+          </p>
+        </div>
+
+        <div className="rounded-lg border bg-muted/30 px-4 py-3">
+          <p className="text-xs text-muted-foreground">Pizzas filtradas</p>
+          <p className="text-2xl font-bold text-primary">
+            {totalPizzasFiltradas}
+          </p>
+        </div>
+      </div>
           {loading ? (
             <div className="text-center p-12">
               <div className="animate-spin inline-block h-8 w-8 border-b-2 border-primary rounded-full"></div>

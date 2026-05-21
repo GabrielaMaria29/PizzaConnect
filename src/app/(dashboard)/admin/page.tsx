@@ -48,7 +48,14 @@ export default function AdminPage() {
   }, {});
 
   const sellerPerformance = orders.reduce((acc: any, order) => {
-    acc[order.vendedorNome] = (acc[order.vendedorNome] || 0) + 1;
+    const totalPizzasPedido =
+      order.sabores?.reduce((sum: number, sabor: any) => {
+        return sum + Number(sabor.quantidade || 0);
+      }, 0) || 0;
+  
+    acc[order.vendedorNome] =
+      (acc[order.vendedorNome] || 0) + totalPizzasPedido;
+  
     return acc;
   }, {});
 
@@ -163,7 +170,7 @@ export default function AdminPage() {
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="font-headline text-xl text-primary">
-              Vendas por Vendedor
+              Quantidade de pizzas vendidas por vendedor
             </CardTitle>
           </CardHeader>
           <CardContent>
