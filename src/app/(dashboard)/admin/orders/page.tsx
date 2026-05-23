@@ -38,6 +38,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from "@/components/ui/radio-group";
+type PagamentoTipo = "Pix" | "Cartão" | "Dinheiro" | "Ainda vai pagar";
 
 export default function AdminOrdersPage() {
   const { orders, loading, editOrder, deleteOrder } = useOrders();
@@ -65,28 +70,24 @@ export default function AdminOrdersPage() {
       o.sabores?.some((s) => s.nome === filterSabor && s.quantidade > 0);
 
     const matchesPagamento =
-      filterPagamento === "all" || o.pagamento.includes(filterPagamento);
+      filterPagamento === "all" || o.pagamento === filterPagamento;
 
     const matchesEntregue =
       filterEntregue === "all" || o.entregue === filterEntregue;
 
-    return (
-      matchesSearch &&
-      matchesSabor &&
-      matchesPagamento &&
-      matchesEntregue
-    );
+    return matchesSearch && matchesSabor && matchesPagamento && matchesEntregue;
   });
+
   const totalPedidosFiltrados = filteredOrders.length;
 
-    const totalPizzasFiltradas = filteredOrders.reduce((acc, order) => {
-      return (
-        acc +
-        (order.sabores?.reduce((sum, sabor) => {
-          return sum + Number(sabor.quantidade || 0);
-        }, 0) || 0)
-      );
-    }, 0);
+  const totalPizzasFiltradas = filteredOrders.reduce((acc, order) => {
+    return (
+      acc +
+      (order.sabores?.reduce((sum, sabor) => {
+        return sum + Number(sabor.quantidade || 0);
+      }, 0) || 0)
+    );
+  }, 0);
 
   const handleEdit = async (values: any) => {
     if (!selectedOrder?.id) return;
@@ -109,6 +110,41 @@ export default function AdminOrdersPage() {
     toast({
       title: "Excluído",
       description: "Pedido removido com sucesso.",
+    });
+  };
+
+  const handleToggleEntregue = async (order: any) => {
+    if (!order.id) return;
+
+    const novoEntregue = order.entregue === "SIM" ? "NÃO" : "SIM";
+
+    await editOrder(order.id, {
+      entregue: novoEntregue,
+    });
+
+    toast({
+      title: "Entrega atualizada",
+      description: `Pedido marcado como ${novoEntregue}.`,
+    });
+  };
+ 
+  const handleUpdatePagamento = async (
+    order: any,
+    novoPagamento: PagamentoTipo
+  ) => {
+    if (!order.id) return;
+  
+    await editOrder(order.id, {
+      pagamento: novoPagamento,
+      dataPagamento:
+        novoPagamento === "Ainda vai pagar"
+          ? ""
+          : order.dataPagamento || new Date().toISOString().slice(0, 10),
+    });
+  
+    toast({
+      title: "Pagamento atualizado",
+      description: `Forma de pagamento alterada para ${novoPagamento}.`,
     });
   };
 
@@ -208,7 +244,7 @@ export default function AdminOrdersPage() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                placeholder="Nome, telefone ou vendedor..."
+                placeholder="Nome, telefone, vendedor ou canhoto..."
                 className="pl-9"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -257,21 +293,22 @@ export default function AdminOrdersPage() {
         </CardHeader>
 
         <CardContent>
-        <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        <div className="rounded-lg border bg-muted/30 px-4 py-3">
-          <p className="text-xs text-muted-foreground">Pedidos filtrados</p>
-          <p className="text-2xl font-bold text-primary">
-            {totalPedidosFiltrados}
-          </p>
-        </div>
+          <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            <div className="rounded-lg border bg-muted/30 px-4 py-3">
+              <p className="text-xs text-muted-foreground">Pedidos filtrados</p>
+              <p className="text-2xl font-bold text-primary">
+                {totalPedidosFiltrados}
+              </p>
+            </div>
 
-        <div className="rounded-lg border bg-muted/30 px-4 py-3">
-          <p className="text-xs text-muted-foreground">Pizzas filtradas</p>
-          <p className="text-2xl font-bold text-primary">
-            {totalPizzasFiltradas}
-          </p>
-        </div>
-      </div>
+            <div className="rounded-lg border bg-muted/30 px-4 py-3">
+              <p className="text-xs text-muted-foreground">Pizzas filtradas</p>
+              <p className="text-2xl font-bold text-primary">
+                {totalPizzasFiltradas}
+              </p>
+            </div>
+          </div>
+
           {loading ? (
             <div className="text-center p-12">
               <div className="animate-spin inline-block h-8 w-8 border-b-2 border-primary rounded-full"></div>
@@ -299,7 +336,9 @@ export default function AdminOrdersPage() {
                       <TableCell className="text-xs">
                         {formatDate(order.createdAt)}
                       </TableCell>
-                      <TableCell>{order.numeroCanhoto}</TableCell>
+
+                      <TableCell>{order.numeroCanhoto || "-"}</TableCell>
+
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="font-semibold">{order.nome}</span>
@@ -316,18 +355,77 @@ export default function AdminOrdersPage() {
                       <TableCell>
                         <div className="flex flex-wrap gap-1 max-w-[240px]">
                           {order.sabores?.map((s) => (
-                              <Badge key={s.nome}>
-                                {s.nome} ({s.quantidade})
-                              </Badge>
-                            ))
-                          }
+                            <Badge
+                              key={s.nome}
+                              variant="secondary"
+                              className="text-[10px]"
+                            >
+                              {s.nome} ({s.quantidade})
+                            </Badge>
+                          ))}
                         </div>
                       </TableCell>
 
                       <TableCell>
-                        <Badge variant="outline" className="text-[10px]">
-                          {order.pagamento}
-                        </Badge>
+                      <RadioGroup
+                          value={order.pagamento}
+                          onValueChange={(value) =>
+                            handleUpdatePagamento(order, value as PagamentoTipo)
+                          }
+                          className="flex flex-col gap-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem
+                              value="Ainda vai pagar"
+                              id={`pending-${order.id}`}
+                            />
+                            <label
+                              htmlFor={`pending-${order.id}`}
+                              className="text-xs cursor-pointer"
+                            >
+                              Ainda vai pagar
+                            </label>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem
+                              value="Pix"
+                              id={`pix-${order.id}`}
+                            />
+                            <label
+                              htmlFor={`pix-${order.id}`}
+                              className="text-xs cursor-pointer"
+                            >
+                              Pix
+                            </label>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem
+                              value="Cartão"
+                              id={`cartao-${order.id}`}
+                            />
+                            <label
+                              htmlFor={`cartao-${order.id}`}
+                              className="text-xs cursor-pointer"
+                            >
+                              Cartão
+                            </label>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem
+                              value="Dinheiro"
+                              id={`dinheiro-${order.id}`}
+                            />
+                            <label
+                              htmlFor={`dinheiro-${order.id}`}
+                              className="text-xs cursor-pointer"
+                            >
+                              Dinheiro
+                            </label>
+                          </div>
+                        </RadioGroup>
                       </TableCell>
 
                       <TableCell className="text-sm whitespace-nowrap">
@@ -335,18 +433,23 @@ export default function AdminOrdersPage() {
                       </TableCell>
 
                       <TableCell>
-                        <Badge
-                          variant={
-                            order.entregue === "SIM"
-                              ? "default"
-                              : order.entregue === "DOAÇÃO"
-                              ? "secondary"
-                              : "outline"
-                          }
-                          className="text-[10px]"
-                        >
-                          {order.entregue}
-                        </Badge>
+                        {order.entregue === "DOAÇÃO" ? (
+                          <Badge variant="secondary" className="text-[10px]">
+                            DOAÇÃO
+                          </Badge>
+                        ) : (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant={
+                              order.entregue === "SIM" ? "default" : "outline"
+                            }
+                            onClick={() => handleToggleEntregue(order)}
+                            className="text-xs"
+                          >
+                            {order.entregue === "SIM" ? "SIM" : "NÃO"}
+                          </Button>
+                        )}
                       </TableCell>
 
                       <TableCell className="text-right">
@@ -379,7 +482,10 @@ export default function AdminOrdersPage() {
 
                   {!loading && filteredOrders.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                      <TableCell
+                        colSpan={9}
+                        className="text-center py-8 text-muted-foreground"
+                      >
                         Nenhum pedido encontrado com os filtros atuais.
                       </TableCell>
                     </TableRow>
@@ -392,7 +498,7 @@ export default function AdminOrdersPage() {
       </Card>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+        <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto p-6">
           <DialogHeader>
             <DialogTitle>Editar Pedido</DialogTitle>
           </DialogHeader>
